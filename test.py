@@ -1,4 +1,4 @@
-data = "data1.txt"
+data = "data1.txt" #
 
 with open(data) as file:
     text = file.read().replace('\n', ' ')
