@@ -10,3 +10,22 @@ doc = nlp(text)
 sentences = list(doc.sents)
 for sentence in sentences:
         print(sentence)
+        
+## RL's attempt
+import spacy # haven't really figured out how to use spacy yet
+ 
+with open("./data/data.txt", 'r') as f:
+    NUMBERS = '1234567890'
+    paragraphs = []
+    sentences = []
+## to separate paragraphs
+    for line in f:
+        new = line.rstrip('\n')
+        if new[0] in NUMBERS:
+            new = new.strip(new[0])
+            paragraphs.append(new)      
+## to split sentences in each paragraph
+    for para in paragraphs:
+        sentence = para.split('.')
+        sentences.append(sentence)
+        print(sentence)
