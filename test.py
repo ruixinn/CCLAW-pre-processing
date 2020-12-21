@@ -60,7 +60,7 @@ for i in range(len(data_paras_baseline)):
   for sentence in data_paras_baseline[i]:
     if sentence in test_paras[i]:
       correct_baseline += 1
-  actual_baseline += 1
+    actual_baseline += 1
 
 # check accuracy of sentencizer under test 
 correct_test = 0
@@ -69,7 +69,7 @@ for i in range(len(data_paras_test)):
   for sentence in data_paras_test[i]:
     if sentence in test_paras[i]:
       correct_test += 1
-  actual_test += 1
+    actual_test += 1
 
 # Display results
 print(f"RESULTS (baseline values in parentheses): \n\
