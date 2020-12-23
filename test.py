@@ -1,4 +1,4 @@
-from sentencizers.sentencizer_baseline import sentencizer_baseline
+from baseline import apply_baseline
 from parse import parse_lines
 
 # IMPORT YOUR TESTING FUNCTION HERE
@@ -8,6 +8,11 @@ from sentencizers.my_sentencizer import my_sentencizer
 
 data = "./data/data_small.txt"
 test = "./data/data_small_test.txt"
+
+# Disable this if you only want to run the sentencizer under test to save time
+# -----------------------------------------------------------
+APPLY_BASELINE = True
+# -----------------------------------------------------------
 
 # generate list of sentences from manually delineated data 
 lines = []
@@ -35,22 +40,22 @@ data_paras = parse_lines(lines)
 assert len(data_paras) == len(correct_paras), "Number of paragraphs in data and test files unequal."
 
 # apply baseline_sentencizer
-# print("Applying baseline sentencizer...")
-# data_paras_baseline = []
-# for para in data_paras:
-#   sentence = sentencizer_baseline(para)
-#   data_paras_baseline.append(sentence)
+if APPLY_BASELINE:
+  print("Applying baseline sentencizer...")
+  data_paras_baseline = apply_baseline(data_paras)
+  print("Completed baseline sentencizer")
 
 # apply sentencizer under test
-# print("Completed baseline sentencizer")
 print("Applying test sentencizer...")
 data_paras_test = []
 for para in data_paras:
-  sentence = my_sentencizer(para)     # CHANGE THIS
+  sentence = my_sentencizer(para)     # Change this if your sentencizer is in a different file 
   data_paras_test.append(sentence)
 
 print("Completed test sentencizer")
 print("Comparing results...")
+
+
 # compare correct data vs raw input data
 # this is just a basic heuristic - can definitely be improved (see document for details)
 
@@ -62,11 +67,13 @@ for para in correct_paras:
 # check accuracy of baseline sentencizer
 correct_baseline = 0
 actual_baseline = 0
-# for i in range(len(data_paras_baseline)):
-#   for sentence in data_paras_baseline[i]:
-#     if sentence in correct_paras[i]:
-#       correct_baseline += 1
-#     actual_baseline += 1
+
+if APPLY_BASELINE:
+  for i in range(len(data_paras_baseline)):
+    for sentence in data_paras_baseline[i]:
+      if sentence in correct_paras[i]:
+        correct_baseline += 1
+      actual_baseline += 1
 
 # check accuracy of sentencizer under test 
 correct_test = 0
@@ -81,15 +88,6 @@ for i in range(len(data_paras_test)):
       if i not in wrong_paragraphs:
         wrong_paragraphs.append(i)
     actual_test += 1
-
-# for i in range(len(correct_paras)):
-#   for sentence in correct_paras[i]:
-#     if sentence in data_paras[i]:
-#       correct_test += 1
-#     else:
-#       if i not in wrong_sentences: 
-#         wrong_sentences.append(i)
-#     actual_test += 1
 
 # Display results
 print(f"RESULTS (baseline values in parentheses): \n\
