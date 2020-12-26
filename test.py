@@ -1,31 +1,60 @@
-data = "data1.txt" #input data file name
+import spacy
+from pysbd.utils import PySBDFactory
+
+data = "data1.txt"
+new_file=''
+in_num = False
+
 
 with open(data) as file:
-    text = file.read().replace('\n', ' ') #doesn't work lol
-
-import spacy
-nlp = spacy.load('en_core_web_sm') #lg
-                
-doc = nlp(text)
-sentences = list(doc.sents)
-for sentence in sentences:
-        print(sentence)
+    text = file.read()
+    
+    #conbine multiline quotes
+    for i, char in enumerate(text[:-1]):
+        if char =='\n':
+            if text[i+1].islower():
+                new_file += ' '
+            else:
+                new_file +=char
         
-## RL's attempt
-import spacy # haven't really figured out how to use spacy yet
- 
-with open("./data/data.txt", 'r') as f:
-    NUMBERS = '1234567890'
-    paragraphs = []
-    sentences = []
-## to separate paragraphs
-    for line in f:
-        new = line.rstrip('\n')
-        if new[0] in NUMBERS:
-            new = new.strip(new[0])
-            paragraphs.append(new)      
-## to split sentences in each paragraph
-    for para in paragraphs:
-        sentence = para.split('.')
+        
+        elif char.isdigit() and in_num==False:
+            
+            #remove para numbers
+            if text[i-1]=='\n': 
+                in_num=True
+                
+            #remove footnote markers 
+            elif (text[i-1]=='.' and text[i+2].isupper()) or (text[i-1]=='.' and text[i+1]=='\n'):  #single digit
+                in_num=True
+            elif text[i-1]=='.' and (text[i+3].isupper() or text[i+2]=='\n'): #double digit first num
+                in_num=True
+            else:
+                new_file+=char
+        
+        elif (char ==' ' or char =='\n') and in_num==True:
+            in_num=False
+            new_file+=' '
+         
+        elif in_num==False:
+            new_file+=char
+
+
+new_file=new_file.replace('\n',' ')
+
+def sentencizer_baseline(para):
+    nlp= spacy.blank('en')
+    nlp.add_pipe(PySBDFactory(nlp))
+
+    doc = nlp(para)
+    sentences = list(doc.sents)
+    
+    return [sentence.text for sentence in sentences]
+
+
+for sentence in sentencizer_baseline(new_file):
+    sentence = sentence.strip(' ')
+    if sentence!= '':
         sentences.append(sentence)
-        print(sentence)
+
+
