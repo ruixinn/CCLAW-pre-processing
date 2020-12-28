@@ -5,6 +5,8 @@ def parse_lines(lines):
   counter = 2
   for line in lines:
     if line.split()[0] == str(counter):
+      index = len(str(counter-1))
+      para = para[index+1:] #remove paragraph numbers
       output.append(para)
       para = ""
       counter += 1    
