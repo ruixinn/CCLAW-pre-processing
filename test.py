@@ -1,13 +1,9 @@
 from baseline import apply_baseline
 from parse import parse_lines
 
-import spacy
-from pysbd.utils import PySBDFactory
-
-
 # IMPORT YOUR TESTING FUNCTION HERE
 # -----------------------------------------------------------
-from sentencizers.sentencizer_baseline import sentencizer_baseline
+from sentencizers.my_sentencizer import my_sentencizer
 # -----------------------------------------------------------
 
 data = "./data/data_small.txt"
@@ -15,7 +11,7 @@ test = "./data/data_small_test.txt"
 
 # Disable this if you only want to run the sentencizer under test to save time
 # -----------------------------------------------------------
-APPLY_BASELINE = False
+APPLY_BASELINE = True
 # -----------------------------------------------------------
 
 # generate list of sentences from manually delineated data 
@@ -35,61 +31,26 @@ correct_paras.append(para)
 
 
 # process raw input data
-data = "data1.txt"
-new_file=''
-in_num = False
+lines = []
+with open(data, encoding="utf8") as f:
+  lines = [line.rstrip() for line in f]
 
+data_paras = parse_lines(lines)
 
-with open(data) as file:
-    text = file.read()
-    
-    #conbine multiline quotes
-    for i, char in enumerate(text[:-1]):
-        if char =='\n':
-            if text[i+1].islower():
-                new_file += ' '
-            else:
-                new_file +=char
-        
-        
-        elif char.isdigit() and in_num==False:
-            
-            #remove para numbers
-            if text[i-1]=='\n': 
-                in_num=True
-                
-            #remove footnote markers 
-            elif (text[i-1]=='.' and text[i+2].isupper()) or (text[i-1]=='.' and text[i+1]=='\n'):  #single digit
-                in_num=True
-            elif text[i-1]=='.' and (text[i+3].isupper() or text[i+2]=='\n'): #double digit first num
-                in_num=True
-            else:
-                new_file+=char
-        
-        elif (char ==' ' or char =='\n') and in_num==True:
-            in_num=False
-            new_file+=' '
-         
-        elif in_num==False:
-            new_file+=char
-
-
-new_file=new_file.replace('\n',' ')
-
-# assert len(data_paras) == len(correct_paras), "Number of paragraphs in data and test files unequal."
+assert len(data_paras) == len(correct_paras), "Number of paragraphs in data and test files unequal."
 
 # apply baseline_sentencizer
 if APPLY_BASELINE:
   print("Applying baseline sentencizer...")
-  data_paras_baseline = apply_baseline(new_file)
+  data_paras_baseline = apply_baseline(data_paras)
   print("Completed baseline sentencizer")
 
 # apply sentencizer under test
 print("Applying test sentencizer...")
 data_paras_test = []
-# for para in data_paras:
-sentence = sentencizer_baseline(new_file)     # Change this if your sentencizer is in a different file 
-# data_paras_test.append(sentence)
+for para in data_paras:
+  sentence = my_sentencizer(para)     # Change this if your sentencizer is in a different file 
+  data_paras_test.append(sentence)
 
 print("Completed test sentencizer")
 print("Comparing results...")
